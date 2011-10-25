@@ -1,0 +1,60 @@
+!SESSION 2011-10-20 17:24:29.449 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 17:26:26.690
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 17:26:26.690
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 17:26:26.690
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 17:26:26.690
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 17:26:26.700
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 17:26:26.700
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 17:26:26.700
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 17:26:26.700
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 18:00:59.750
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 18:00:59.751
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:00:59.751
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:00:59.751
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 18:00:59.753
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 18:00:59.753
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:00:59.753
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:00:59.753
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 18:01:22.138
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 18:01:22.138
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:01:22.138
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:01:22.138
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2011-10-20 18:01:22.143
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2011-10-20 18:01:22.143
+!MESSAGE Cannot complete the install because one or more required items could not be found.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:01:22.143
+!MESSAGE Software being installed: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2011-10-20 18:01:22.143
+!MESSAGE Missing requirement: Android Development Tools 14.0.0.v201110171935-205994 (com.android.ide.eclipse.adt.feature.group 14.0.0.v201110171935-205994) requires 'org.eclipse.wst.sse.core 0.0.0' but it could not be found

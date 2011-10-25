@@ -1,0 +1,27 @@
+things to include in dmk 1.0:
+
+- status warning if packet capture rate drops below some threshold, warning user that 
+the connectoin was lost.
+
+- simple digital views of sensors (not fancy svg analog)
+
+- put in 1st time run disclaimer, this is for recreational purposes only
+
+- diagnostic mode, show packet stream, ability to freeze.
+
+- stream view, inserts new packets at top. let those that move out of view at the bottom be destroyed,
+or explicitly limit them through a config.  
+
+things to do in dmklogger 1.0
+
+- design backend to support multiple sensor instances. e.g. support multiple engines.
+
+- LoggerController 
+	- sets up UI
+	- executes in main thread
+	- creates and starts LoggerService
+	
+- LoggerService
+	- creates wifi connection to DMK box
+	- listens to port 1703 for packets
+	- sends messages back to LoggerController in main UI thread
