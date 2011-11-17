@@ -11,13 +11,14 @@ public class Prefs extends PreferenceActivity
 	public static String remoteIP;
 	public static int remotePort;
 	public static int localPort;
+	public static boolean emulationMode;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) 
 	{
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.logger_prefs);
+        addPreferencesFromResource(R.xml.prefs);
     }
 	
 	@Override

@@ -36,10 +36,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-/**
- * 
- */
-public class WifiService extends Service
+public class WifiService extends Service implements DMKService
 {
     private NotificationManager notificationManager;
     private ServiceThread serviceThread;
@@ -48,34 +45,27 @@ public class WifiService extends Service
     private int wifiState;
     private int wifiNetId;
     private final ServiceBinder serviceBinder = new ServiceBinder();
-    private Controller loggerController;
-    
+    private Controller controller;
     private DatagramPacket packet;
     private DatagramSocket socket;
-    //private byte[] buffer; 
     private InetSocketAddress localAddress;
     private InetSocketAddress remoteAddress;
-    
     private WifiReceiver wifiReceiver;
     private WifiConfiguration config;
-    
-    
 
     @Override
     public void onCreate() 
     {
-    	//loggerController.log("LoggerServiceThread.onCreate()");
-    	Log.e(Constants.LOG_ID, "LoggerServiceThread.onCreate");
+    	Log.e(Constants.LOG_ID, "ServiceThread.onCreate");
     	
     	notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
     	showNotification();
     	
-    	// start logging thread
-        serviceThread = new ServiceThread();
+    	serviceThread = new ServiceThread();
         serviceThread.start();
     }
     
-    public void stopLogging()
+    public void stop()
     {
     	doLogging = false;
     	
@@ -86,18 +76,17 @@ public class WifiService extends Service
 	    	socket = null;
 	    	//buffer = null;
 	    	packet = null;
-	    	
     	}
     }
     
-    public int startLogging()
+    public void start()
     {
     	
     	new Thread(new Runnable()
     	{
     		public void run()
     		{
-    			loggerController.log("connecting to socket...");
+    			controller.log("connecting to socket...");
     			
     			localAddress =  new InetSocketAddress(Prefs.localPort);
     			remoteAddress =  new InetSocketAddress(Prefs.remoteIP, Prefs.remotePort);
@@ -121,11 +110,11 @@ public class WifiService extends Service
     				
     				if(socket.isConnected())
     				{
-    					loggerController.log("socket is connected to local_port="+socket.getLocalPort()+" remote_address="+socket.getRemoteSocketAddress().toString());
+    					controller.log("socket is connected to local_port="+socket.getLocalPort()+" remote_address="+socket.getRemoteSocketAddress().toString());
     					doLogging = true;
     				}else
     				{
-    					loggerController.log("socket failed to connect");	
+    					controller.log("socket failed to connect");	
     				}
     				
     				
@@ -133,19 +122,18 @@ public class WifiService extends Service
     			} 
     			catch (Exception e) {
     				final String msg = e.getMessage();
-    				loggerController.log("error setting up socket "+msg);	
+    				controller.log("error setting up socket "+msg);	
     			}
     		}
     	}).start();
 		
-		return START_STICKY;
     }
     
 
     @Override
     public void onDestroy() 
     {
-    	loggerController.log("LoggerService.onDestroy, stopping thread and destroying socket");
+    	controller.log("Service.onDestroy, stopping thread and destroying socket");
     	
     	serviceThread.stopRunning();
     	
@@ -167,7 +155,7 @@ public class WifiService extends Service
     {
     	public void setController(Controller lc)
     	{
-    		loggerController = lc;
+    		controller = lc;
     	}
     	
         public WifiService getService() 
@@ -233,18 +221,18 @@ public class WifiService extends Service
         				String msg = new String(packet.getData(), 0, packet.getLength());
         				
         				//just output to screen, don't do any parsing in this app
-        				loggerController.log(msg);
+        				controller.log(msg);
         				
 					} 
         			catch (InterruptedIOException ior)
         			{
-        				loggerController.log("socket.receive timeout");
+        				controller.log("socket.receive timeout");
         			}
         			
         			catch (Exception e) 
 					{
 						//Log.e(LoggerConstants.LOG_ID, "error receiving from socket "+e.getMessage());
-						loggerController.log("error in read operation: "+ e.getMessage());
+						controller.log("error in read operation: "+ e.getMessage());
 					}
         		}
         		
@@ -270,10 +258,10 @@ public class WifiService extends Service
     {
     	
 		//change system setting to static IP
-		Settings.System.putInt(loggerController.getContentResolver(), Settings.System.WIFI_USE_STATIC_IP, 1);
-		Settings.System.putString(loggerController.getContentResolver(), Settings.System.WIFI_STATIC_IP, "192.168.1.4");
-		Settings.System.putString(loggerController.getContentResolver(), Settings.System.WIFI_STATIC_NETMASK, "255.255.255.0");
-		Settings.System.putString(loggerController.getContentResolver(), Settings.System.WIFI_STATIC_GATEWAY, "192.168.1.1");
+		Settings.System.putInt(controller.getContentResolver(), Settings.System.WIFI_USE_STATIC_IP, 1);
+		Settings.System.putString(controller.getContentResolver(), Settings.System.WIFI_STATIC_IP, "192.168.1.4");
+		Settings.System.putString(controller.getContentResolver(), Settings.System.WIFI_STATIC_NETMASK, "255.255.255.0");
+		Settings.System.putString(controller.getContentResolver(), Settings.System.WIFI_STATIC_GATEWAY, "192.168.1.1");
 		//Settings.System.putString(loggerController.getContentResolver(), Settings.System.WIFI_STATIC_DNS1, "192.168.1.1");
 		//Settings.System.putString(loggerController.getContentResolver(), Settings.System.WIFI_STATIC_DNS2, "192.168.1.1");
 		
@@ -284,10 +272,10 @@ public class WifiService extends Service
         if(!wifiManager.isWifiEnabled())
         	if(wifiManager.setWifiEnabled(true))
         	{
-        		this.loggerController.log("wifi enabled");
+        		this.controller.log("wifi enabled");
         			
         	}else{
-        		this.loggerController.log("wifi not enabled");
+        		this.controller.log("wifi not enabled");
         	}
         
         //register broadcast receiver to listen to network events
@@ -336,7 +324,7 @@ public class WifiService extends Service
         	//config.networkId = wifiNetId;
         	wifiManager.saveConfiguration();
         }
-        loggerController.log("wifiManager.enableNetwork(dmk config) returned "+enabled);
+        controller.log("wifiManager.enableNetwork(dmk config) returned "+enabled);
        
     }
     
@@ -371,7 +359,7 @@ public class WifiService extends Service
 			if(action.equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION))
 			{
 				SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
-				loggerController.log("supplicant state changed to "+state.name());
+				controller.log("supplicant state changed to "+state.name());
 				
 				if(state.compareTo(SupplicantState.SCANNING) == 0)
 				{
@@ -386,20 +374,20 @@ public class WifiService extends Service
 			}
 			else if(action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION))
 			{
-				loggerController.log("WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION...");
+				controller.log("WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION...");
 				
 				if(intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false))
 				{
 					//get conn info
 					WifiInfo info = wifiManager.getConnectionInfo();
 					final int IP = info.getIpAddress();
-					loggerController.log("wifi my IP="+IP);
+					controller.log("wifi my IP="+IP);
 					
 					//if(IP >= 1921681102 && IP <= 1921681104)
 					if(true)
 					{
 						
-						loggerController.log("Wifi is enabled, connecting to socket");
+						controller.log("Wifi is enabled, connecting to socket");
 						//connect to socket
 						try 
 						{
@@ -409,19 +397,17 @@ public class WifiService extends Service
 							socket.connect(new InetSocketAddress("0.0.0.0", 1703));
 							if(socket.isConnected())
 							{
-								loggerController.log("socket is connected to localport="+socket.getLocalPort()+" port="+socket.getPort());	
+								controller.log("socket is connected to localport="+socket.getLocalPort()+" port="+socket.getPort());	
 							}else
 							{
-								loggerController.log("socket is not connected");	
+								controller.log("socket is not connected");	
 							}
 								
 						} 
 						catch (Exception e) {
-							// TODO Auto-generated catch block
-							
 							e.printStackTrace();
 							final String msg = e.getMessage();
-							loggerController.log("error setting up socket"+msg);	
+							controller.log("error setting up socket"+msg);	
 						}
 					}
 				}
@@ -431,19 +417,19 @@ public class WifiService extends Service
 			else if(action.equals(WifiManager.WIFI_STATE_CHANGED_ACTION))
 			{
 				wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
-				loggerController.log("WifiReceiver.onReceive WifiManager.WIFI_STATE_CHANGED_ACTION wifiState="+wifiState);
+				controller.log("WifiReceiver.onReceive WifiManager.WIFI_STATE_CHANGED_ACTION wifiState="+wifiState);
 				switch(wifiState)
 				{
 					case WifiManager.WIFI_STATE_DISABLED:
 					case WifiManager.WIFI_STATE_DISABLING:
-						loggerController.log("system says wifi is disabling/disabled, stop listening to port");
+						controller.log("system says wifi is disabling/disabled, stop listening to port");
 						doLogging = false;
 						break;
 					case WifiManager.WIFI_STATE_ENABLED:
-						loggerController.log("wifi is enabled");
+						controller.log("wifi is enabled");
 						break;
 					case WifiManager.WIFI_STATE_ENABLING:
-						loggerController.log("wifi is enabling");
+						controller.log("wifi is enabling");
 						break;
 					case WifiManager.WIFI_STATE_UNKNOWN:
 						break;
@@ -452,30 +438,30 @@ public class WifiService extends Service
 			else if(action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
 			{
 				List<ScanResult> results = wifiManager.getScanResults();
-				loggerController.log("scan results returned, got "+results.size()+" configs. connected to="+wifiManager.getConnectionInfo().getSSID()+" state="+wifiManager.getConnectionInfo().getSupplicantState().name());
+				controller.log("scan results returned, got "+results.size()+" configs. connected to="+wifiManager.getConnectionInfo().getSSID()+" state="+wifiManager.getConnectionInfo().getSupplicantState().name());
 				for(int i=0; i<results.size(); i++)
 				{
-					loggerController.log("...got BSSID="+results.get(i).BSSID+" SSID="+results.get(i).SSID);
+					controller.log("...got BSSID="+results.get(i).BSSID+" SSID="+results.get(i).SSID);
 					if(results.get(i).SSID.equals(Constants.SSID))
 					{
 						config.BSSID = results.get(i).BSSID;
 						
 						//wifiManager.enableNetwork(wifiNetId, true);
-						loggerController.log("attempt something to connect to DMK?");
+						controller.log("attempt something to connect to DMK?");
 					}
 				}
 			}
 			else if(action.equals(WifiManager.EXTRA_SUPPLICANT_ERROR))
 			{
 				int err = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
-				loggerController.log("EXTRA_SUPPLICANT_ERROR="+err+" (1==authentication error)");
+				controller.log("EXTRA_SUPPLICANT_ERROR="+err+" (1==authentication error)");
 			}
 			else
 			{
-				loggerController.log("got an unsubscribed action="+action);
+				controller.log("got an unsubscribed action="+action);
 			}
 			
 		}
     }
-}
+ }
 

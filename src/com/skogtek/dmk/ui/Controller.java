@@ -21,6 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.skogtek.dmk.R;
 import com.skogtek.dmk.Constants;
+import com.skogtek.dmk.service.DMKService;
 import com.skogtek.dmk.service.WifiService;
 import com.skogtek.dmk.service.WifiService.ServiceBinder;
 
@@ -28,30 +29,10 @@ public class Controller extends ListActivity
 {
     private Intent serviceIntent;
 	private boolean serviceBound = false;
-	private WifiService wifiService;
+	private DMKService dmkService;
 	private ServiceBinder serviceBinder;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	
-	private ServiceConnection serviceConnection = new ServiceConnection() 
-	{
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) 
-        {
-        	Log.e(Constants.LOG_ID, "service is connected, setting bridge between controller and service");
-        	serviceBinder = ((ServiceBinder)service);
-        	serviceBinder.setController(Controller.this);
-        	wifiService = serviceBinder.getService();
-            
-            serviceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) 
-        {
-            serviceBound = false;
-        }
-    };
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -64,6 +45,7 @@ public class Controller extends ListActivity
         Prefs.remoteIP = settings.getString("remote_ip", "192.168.1.5");
         Prefs.remotePort = settings.getInt("remote_port", 1703);
         Prefs.localPort = settings.getInt("local_port", 1703);
+        Prefs.emulationMode = settings.getBoolean("emulation_mode", false);
         
         //create the service and bind this Activity to it
         serviceIntent = new Intent(this, WifiService.class);
@@ -86,6 +68,26 @@ public class Controller extends ListActivity
         });
     }
     
+	private ServiceConnection serviceConnection = new ServiceConnection() 
+	{
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) 
+        {
+        	Log.e(Constants.LOG_ID, "service is connected, setting bridge between controller and service");
+        	serviceBinder = ((ServiceBinder)service);
+        	serviceBinder.setController(Controller.this);
+        	dmkService = serviceBinder.getService();
+            
+            serviceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) 
+        {
+            serviceBound = false;
+        }
+    };
+    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
@@ -104,13 +106,13 @@ public class Controller extends ListActivity
 	        case R.id.start_logging:
 	        	if(serviceBound)
 	        	{
-	        		wifiService.startLogging();
+	        		dmkService.start();
 	        	}
 	            return true;
 	        case R.id.stop_logging:
 	        	if(serviceBound)
 	        	{
-		            wifiService.stopLogging();
+		            dmkService.stop();
 	        	}
 	            return true;
 	        case R.id.preferences:

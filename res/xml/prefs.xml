@@ -1,10 +1,18 @@
 <PreferenceScreen
         xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory
-                android:title="@string/dmk_connect">
-   
+        android:title="@string/dmk_connect">
+                
+   <CheckBoxPreference
+		android:key="emulation_mode"
+		android:disableDependentsState="true"
+		android:summaryOff="@string/emu_off"
+		android:summaryOn="@string/emu_on"
+		/>
+	
 	<EditTextPreference
 		android:key="remote_ip"
+		android:dependency="emulation_mode"
 		android:title="@string/remote_ip"
 		android:summary="@string/remote_ip" 
 		android:defaultValue="192.168.1.5"
@@ -12,6 +20,7 @@
 		
 	<EditTextPreference
 		android:key="remote_port"
+		android:dependency="emulation_mode"
 		android:title="@string/remote_port"
 		android:summary="@string/remote_port" 
 		android:defaultValue="1703"
@@ -19,10 +28,14 @@
 		
 	<EditTextPreference
 		android:key="local_port"
+		android:dependency="emulation_mode"
 		android:title="@string/local_port"
 		android:summary="@string/local_port" 
 		android:defaultValue="1703"
 		/>
+				
+	
+		
 		
 	</PreferenceCategory>
    

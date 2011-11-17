@@ -19,4 +19,6 @@
     <string name="remote_port">Remote Port</string>
     <string name="dmk_connect">DMK connection</string>
     <string name="local_port">Local Port</string>
+    <string name="emu_on">Emulation Mode On</string>
+    <string name="emu_off">Emulation Mode Off</string>
 </resources>
