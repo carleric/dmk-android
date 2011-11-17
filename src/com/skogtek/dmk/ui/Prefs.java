@@ -1,7 +1,6 @@
-package com.skogtek.dmk;
+package com.skogtek.dmk.ui;
 
 import com.skogtek.dmk.R;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.View;

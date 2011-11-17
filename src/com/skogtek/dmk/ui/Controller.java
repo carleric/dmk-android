@@ -21,17 +21,16 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.skogtek.dmk.R;
 import com.skogtek.dmk.Constants;
-import com.skogtek.dmk.Prefs;
 import com.skogtek.dmk.service.WifiService;
-import com.skogtek.dmk.service.WifiService.LoggerBinder;
+import com.skogtek.dmk.service.WifiService.ServiceBinder;
 
 public class Controller extends ListActivity 
 {
-    private Intent loggerServiceIntent;
+    private Intent serviceIntent;
 	private boolean serviceBound = false;
-	private WifiService loggerService;
-	private LoggerBinder loggerBinder;
-	private ListAdapter loggerListAdapter;
+	private WifiService wifiService;
+	private ServiceBinder serviceBinder;
+	private ListAdapter listAdapter;
 	private ListView listView;
 	
 	private ServiceConnection serviceConnection = new ServiceConnection() 
@@ -40,9 +39,9 @@ public class Controller extends ListActivity
         public void onServiceConnected(ComponentName className, IBinder service) 
         {
         	Log.e(Constants.LOG_ID, "service is connected, setting bridge between controller and service");
-        	loggerBinder = ((LoggerBinder)service);
-        	loggerBinder.setLoggerController(Controller.this);
-            loggerService = loggerBinder.getService();
+        	serviceBinder = ((ServiceBinder)service);
+        	serviceBinder.setController(Controller.this);
+        	wifiService = serviceBinder.getService();
             
             serviceBound = true;
         }
@@ -66,14 +65,12 @@ public class Controller extends ListActivity
         Prefs.remotePort = settings.getInt("remote_port", 1703);
         Prefs.localPort = settings.getInt("local_port", 1703);
         
-
         //create the service and bind this Activity to it
-        loggerServiceIntent = new Intent(this, WifiService.class);
-        bindService(loggerServiceIntent, serviceConnection, BIND_AUTO_CREATE);
+        serviceIntent = new Intent(this, WifiService.class);
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
         
-        
-        loggerListAdapter = new ListAdapter(this);
-        setListAdapter(loggerListAdapter);
+        listAdapter = new ListAdapter(this);
+        setListAdapter(listAdapter);
         
         listView = getListView();
         listView.setTextFilterEnabled(true);
@@ -107,13 +104,13 @@ public class Controller extends ListActivity
 	        case R.id.start_logging:
 	        	if(serviceBound)
 	        	{
-	        		loggerService.startLogging();
+	        		wifiService.startLogging();
 	        	}
 	            return true;
 	        case R.id.stop_logging:
 	        	if(serviceBound)
 	        	{
-		            loggerService.stopLogging();
+		            wifiService.stopLogging();
 	        	}
 	            return true;
 	        case R.id.preferences:
@@ -135,10 +132,10 @@ public class Controller extends ListActivity
     		public void run()
     		{
     			//post msg to listview
-            	loggerListAdapter.appendItem(msg);
+            	listAdapter.appendItem(msg);
             	
             	//listView.setSelectionFromTop(loggerListAdapter.getCount(), 20);
-            	listView.smoothScrollToPosition(loggerListAdapter.getCount());
+            	listView.smoothScrollToPosition(listAdapter.getCount());
     		}
     	});
     	

@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         
-         <activity android:name="com.skogtek.dmk.Prefs" android:label="@string/dmk_connect">
+         <activity android:name=".ui.Prefs" android:label="@string/dmk_connect">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

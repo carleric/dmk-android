@@ -9,6 +9,6 @@ public class Constants
 	public static final String PRESHAREDKEY = "\"dmkyacht\"";
 	
 
-	public static final String PREFS_FILE_NAME = "DMKLoggerPrefs";
+	public static final String PREFS_FILE_NAME = "DMKPrefs";
 	
 }

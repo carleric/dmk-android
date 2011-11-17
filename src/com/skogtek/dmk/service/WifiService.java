@@ -13,8 +13,8 @@ import java.util.List;
 
 import com.skogtek.dmk.R;
 import com.skogtek.dmk.ui.Controller;
+import com.skogtek.dmk.ui.Prefs;
 import com.skogtek.dmk.Constants;
-import com.skogtek.dmk.Prefs;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -42,12 +42,12 @@ import android.widget.Toast;
 public class WifiService extends Service
 {
     private NotificationManager notificationManager;
-    private LoggerServiceThread loggerServiceThread;
+    private ServiceThread serviceThread;
     private boolean doLogging = false;
     private WifiManager wifiManager;
     private int wifiState;
     private int wifiNetId;
-    private final LoggerBinder loggerBinder = new LoggerBinder();
+    private final ServiceBinder serviceBinder = new ServiceBinder();
     private Controller loggerController;
     
     private DatagramPacket packet;
@@ -71,8 +71,8 @@ public class WifiService extends Service
     	showNotification();
     	
     	// start logging thread
-        loggerServiceThread = new LoggerServiceThread();
-        loggerServiceThread.start();
+        serviceThread = new ServiceThread();
+        serviceThread.start();
     }
     
     public void stopLogging()
@@ -147,7 +147,7 @@ public class WifiService extends Service
     {
     	loggerController.log("LoggerService.onDestroy, stopping thread and destroying socket");
     	
-    	loggerServiceThread.stopRunning();
+    	serviceThread.stopRunning();
     	
     	if(socket != null)
     	{
@@ -163,9 +163,9 @@ public class WifiService extends Service
         Toast.makeText(this, R.string.service_finished, Toast.LENGTH_SHORT).show();
     }
     
-    public class LoggerBinder extends Binder 
+    public class ServiceBinder extends Binder 
     {
-    	public void setLoggerController(Controller lc)
+    	public void setController(Controller lc)
     	{
     		loggerController = lc;
     	}
@@ -184,7 +184,7 @@ public class WifiService extends Service
     @Override
     public IBinder onBind(Intent intent) 
     {
-        return loggerBinder;
+        return serviceBinder;
     }
 
     /**
@@ -213,7 +213,7 @@ public class WifiService extends Service
     }
 
     
-    private class LoggerServiceThread extends Thread
+    private class ServiceThread extends Thread
     {
     	private boolean run = true; 
     	
