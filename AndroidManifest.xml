@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.skogtek.android.dmklogger"
+      package="com.skogtek.dmk"
       android:versionCode="1"
       android:versionName="1.0">
       
@@ -17,9 +17,11 @@
 	
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
 
-		<service android:name=".LoggerService" />
+		<service android:name="com.skogtek.dmk.service.WifiService" />
+		
+		<service android:name="com.skogtek.dmk.service.EmulatorService" />
 
-        <activity android:name=".LoggerController" android:label="@string/app_name">
+        <activity android:name=".ui.Controller" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -27,7 +29,7 @@
             </intent-filter>
         </activity>
         
-         <activity android:name=".LoggerPrefs" android:label="@string/dmk_connect">
+         <activity android:name="com.skogtek.dmk.Prefs" android:label="@string/dmk_connect">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
