@@ -1,5 +1,7 @@
 package com.skogtek.dmk.service;
 
+import android.database.sqlite.SQLiteDatabase;
+
 
 public class EmulatorService extends DMKService
 {
@@ -28,9 +30,7 @@ public class EmulatorService extends DMKService
     	{
     		public void run()
     		{
-    			//do things that must be done once on start
     			
-    			//open emulation database
     			
     		}
     	}).start();
