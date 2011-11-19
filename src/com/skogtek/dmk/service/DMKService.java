@@ -1,21 +1,6 @@
-/*
- * Copyright (C) 2007 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.skogtek.dmk.service;
 
+import java.util.ArrayList;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,41 +9,83 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Process;
-import android.os.RemoteCallbackList;
+import android.os.Messenger;
 import android.os.RemoteException;
 import android.widget.Toast;
 
 import com.skogtek.dmk.R;
 import com.skogtek.dmk.ui.Controller;
 
-/**
- * This is an example of implementing an application service that runs in a
- * different process than the application.  Because it can be in another
- * process, we must use IPC to interact with it.  The
- * {@link Controller} and {@link Binding} classes
- * show how to interact with the service.
- * 
- * <p>Note that most applications <strong>do not</strong> need to deal with
- * the complexity shown here.  If your application simply has a service
- * running in its own process, the {@link LocalService} sample shows a much
- * simpler way to interact with it.
- */
 public class DMKService extends Service {
-    /**
-     * This is a list of callbacks that have been registered with the
-     * service.  Note that this is package scoped (instead of private) so
-     * that it can be accessed more efficiently from inner classes.
-     */
-    final RemoteCallbackList<IRemoteServiceCallback> mCallbacks
-            = new RemoteCallbackList<IRemoteServiceCallback>();
-    
-    int mValue = 0;
     NotificationManager mNM;
+    protected ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+    int mValue = 0;
     
-    static final int MSG_REGISTER_CLIENT = 1;
-    static final int MSG_UNREGISTER_CLIENT = 2;
-    static final int MSG_SET_VALUE = 3;
+    public static final int MSG_REGISTER_CLIENT = 1;
+    public static final int MSG_UNREGISTER_CLIENT = 2;
+    public static final int MSG_START_SERVING = 3;
+    public static final int MSG_STOP_SERVING = 4;
+    public static final int MSG_SET_VALUE = 5;
+    
+    protected class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClients.add(msg.replyTo);
+                    break;
+                case MSG_UNREGISTER_CLIENT:
+                    mClients.remove(msg.replyTo);
+                    break;
+                case MSG_START_SERVING:
+                	start();
+                	break;
+                case MSG_STOP_SERVING:
+                	stop();
+                	break;
+                case MSG_SET_VALUE:
+                    mValue = msg.arg1;
+                    for (int i=mClients.size()-1; i>=0; i--) {
+                        try {
+                            mClients.get(i).send(Message.obtain(null,
+                                    MSG_SET_VALUE, mValue, 0));
+                        } catch (RemoteException e) {
+                            // The client is dead.  Remove it from the list;
+                            // we are going through the list from back to front
+                            // so this is safe to do inside the loop.
+                            mClients.remove(i);
+                        }
+                    }
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+    
+    protected void start(){}
+    protected void stop(){}
+    
+    protected void broadcastMessage(String message)
+    {
+    	for (int i=mClients.size()-1; i>=0; i--) 
+    	{
+            try 
+            {
+                mClients.get(i).send(Message.obtain(null, MSG_SET_VALUE, message));
+            } catch (RemoteException e) {
+                // The client is dead.  Remove it from the list;
+                // we are going through the list from back to front
+                // so this is safe to do inside the loop.
+                mClients.remove(i);
+            }
+        }
+    }
+    
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
     
     @Override
     public void onCreate() {
@@ -66,11 +93,6 @@ public class DMKService extends Service {
 
         // Display a notification about us starting.
         showNotification();
-        
-        // While this service is running, it will continually increment a
-        // number.  Send the first message that is used to perform the
-        // increment.
-        mHandler.sendEmptyMessage(REPORT_MSG);
     }
 
     @Override
@@ -80,90 +102,16 @@ public class DMKService extends Service {
 
         // Tell the user we stopped.
         Toast.makeText(this, R.string.remote_service_stopped, Toast.LENGTH_SHORT).show();
-        
-        // Unregister all callbacks.
-        mCallbacks.kill();
-        
-        // Remove the next pending message to increment the counter, stopping
-        // the increment loop.
-        mHandler.removeMessages(REPORT_MSG);
     }
     
-
+    /**
+     * When binding to the service, we return an interface to our messenger
+     * for sending messages to the service.
+     */
     @Override
     public IBinder onBind(Intent intent) {
-        // Select the interface to return.  If your service only implements
-        // a single interface, you can just return it here without checking
-        // the Intent.
-        if (IRemoteService.class.getName().equals(intent.getAction())) {
-            return mBinder;
-        }
-        if (ISecondary.class.getName().equals(intent.getAction())) {
-            return mSecondaryBinder;
-        }
-        return null;
+        return mMessenger.getBinder();
     }
-
-    /**
-     * The IRemoteInterface is defined through IDL
-     */
-    private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
-        public void registerCallback(IRemoteServiceCallback cb) {
-            if (cb != null) mCallbacks.register(cb);
-        }
-        public void unregisterCallback(IRemoteServiceCallback cb) {
-            if (cb != null) mCallbacks.unregister(cb);
-        }
-    };
-
-    /**
-     * A secondary interface to the service.
-     */
-    private final ISecondary.Stub mSecondaryBinder = new ISecondary.Stub() {
-        public int getPid() {
-            return Process.myPid();
-        }
-        public void basicTypes(int anInt, long aLong, boolean aBoolean,
-                float aFloat, double aDouble, String aString) {
-        }
-    };
-
-    
-    private static final int REPORT_MSG = 1;
-    
-    /**
-     * Our Handler used to execute operations on the main thread.  This is used
-     * to schedule increments of our value.
-     */
-    protected final Handler mHandler = new Handler() {
-        @Override public void handleMessage(Message msg) {
-            switch (msg.what) {
-                
-                // It is time to bump the value!
-                case REPORT_MSG: {
-                    // Up it goes.
-                    int value = ++mValue;
-                    
-                    // Broadcast to all clients the new value.
-                    final int N = mCallbacks.beginBroadcast();
-                    for (int i=0; i<N; i++) {
-                        try {
-                            mCallbacks.getBroadcastItem(i).valueChanged(value);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing
-                            // the dead object for us.
-                        }
-                    }
-                    mCallbacks.finishBroadcast();
-                    
-                    // Repeat every 1 second.
-                    sendMessageDelayed(obtainMessage(REPORT_MSG), 1*1000);
-                } break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    };
 
     /**
      * Show a notification while this service is running.
@@ -188,7 +136,5 @@ public class DMKService extends Service {
         // We use a string id because it is a unique number.  We use it later to cancel.
         mNM.notify(R.string.remote_service_started, notification);
     }
-    
-   
-
 }
+

@@ -1,78 +1,49 @@
 package com.skogtek.dmk.service;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Parcel;
-
-import com.skogtek.dmk.ui.Controller;
 
 public class EmulatorService extends DMKService
 {
     private ServiceThread serviceThread;
     private boolean doSend = false;
-    private Controller controller;
-    private final ServiceBinder serviceBinder = new ServiceBinder();
-    private static String LOG_ID = "ServiceEmulator";  
-    
-    
+    private static String LOG_ID = "EmulatorService";   
     
 
     @Override
     public void onCreate() 
     {
+    	super.onCreate();
+    	
     	serviceThread = new ServiceThread();
     	serviceThread.start();
     }
     
-    public void stop()
+    protected void stop()
     {
     	doSend = false;
     }
     
-    public int start()
+    protected void start()
     {
     	new Thread(new Runnable()
     	{
     		public void run()
     		{
+    			//do things that must be done once on start
     			
+    			//open emulation database
     			
     		}
     	}).start();
-		
-		return START_STICKY;
     }
 
     @Override
     public void onDestroy() 
     {
-    	//controller.log("LoggerService.onDestroy, stopping thread and destroying socket");
-    	
     	serviceThread.stopRunning();
+    	super.onDestroy();
     }
     
-    public class ServiceBinder extends Binder 
-    {
-    	EmulatorService getService() 
-        {
-            return EmulatorService.this;
-        }
-        
-        protected boolean onTransact (int code, Parcel data, Parcel reply, int flags)
-        {
-        	return false;
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) 
-    {
-        return serviceBinder;
-    }
+   
     
     private class ServiceThread extends Thread
     {
@@ -90,6 +61,7 @@ public class EmulatorService extends DMKService
         			try 
         			{
 						//do something
+        				broadcastMessage(".");
         				
 					} 
         			catch (Exception e) 
