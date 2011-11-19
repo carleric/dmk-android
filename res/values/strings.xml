@@ -8,6 +8,8 @@
     <string name="service_finished">Service Done</string>
     <string name="start_logging">Start</string>
     <string name="stop_logging">Stop</string>
+    <string name="start_service">Start</string>
+    <string name="stop_service">Stop</string>
     <string name="exit_app">Exit</string>
     <string name="latitude">Latitude: Nothing yet</string>
     <string name="longitude">Longitude: Nothing yet</string>
@@ -19,6 +21,21 @@
     <string name="remote_port">Remote Port</string>
     <string name="dmk_connect">DMK connection</string>
     <string name="local_port">Local Port</string>
+    <string name="emulation_mode">Emulation Mode</string>
     <string name="emu_on">Emulation Mode On</string>
     <string name="emu_off">Emulation Mode Off</string>
+    
+    <string name="remote_service_started">Remote service has started</string>
+    <string name="remote_service_stopped">Remote service has stopped</string>
+    <string name="remote_service_label">Sample Remote Service</string>
+    
+    <string name="kill_process">Kill Process</string>
+    <string name="remote_service_connected">Connected to remote service</string>
+    <string name="remote_service_disconnected">Disconnected from remote service</string>
+    <string name="remote_call_failed">Failure calling remote service</string>
+    
+    <string name="activity_remote_service_binding">App/Service/Remote Service Binding</string>
+    <string name="remote_service_binding">This demonstrates how you can connect with a persistent
+        service running in another process.  Use the kill button to see what happens when
+        the process crashes.</string>
 </resources>

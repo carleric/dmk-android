@@ -36,7 +36,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-public class WifiService extends Service implements DMKService
+public class WifiService extends DMKService
 {
     private NotificationManager notificationManager;
     private ServiceThread serviceThread;

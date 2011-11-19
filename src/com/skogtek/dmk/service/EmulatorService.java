@@ -3,18 +3,23 @@ package com.skogtek.dmk.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Parcel;
 
 import com.skogtek.dmk.ui.Controller;
 
-public class EmulatorService extends Service
+public class EmulatorService extends DMKService
 {
     private ServiceThread serviceThread;
     private boolean doSend = false;
     private Controller controller;
     private final ServiceBinder serviceBinder = new ServiceBinder();
-    private static String LOG_ID = "ServiceEmulator";    
+    private static String LOG_ID = "ServiceEmulator";  
+    
+    
+    
 
     @Override
     public void onCreate() 
@@ -23,12 +28,12 @@ public class EmulatorService extends Service
     	serviceThread.start();
     }
     
-    public void stopSending()
+    public void stop()
     {
     	doSend = false;
     }
     
-    public int startSending()
+    public int start()
     {
     	new Thread(new Runnable()
     	{
@@ -45,7 +50,7 @@ public class EmulatorService extends Service
     @Override
     public void onDestroy() 
     {
-    	controller.log("LoggerService.onDestroy, stopping thread and destroying socket");
+    	//controller.log("LoggerService.onDestroy, stopping thread and destroying socket");
     	
     	serviceThread.stopRunning();
     }
@@ -89,7 +94,7 @@ public class EmulatorService extends Service
 					} 
         			catch (Exception e) 
 					{
-						controller.log("error in read operation: "+ e.getMessage());
+						//controller.log("error in read operation: "+ e.getMessage());
 					}
         		}
     		}

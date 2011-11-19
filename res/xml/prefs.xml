@@ -5,9 +5,12 @@
                 
    <CheckBoxPreference
 		android:key="emulation_mode"
+		android:title="@string/emulation_mode"
 		android:disableDependentsState="true"
 		android:summaryOff="@string/emu_off"
 		android:summaryOn="@string/emu_on"
+		android:focusable="false" 
+      	android:focusableInTouchMode="false"
 		/>
 	
 	<EditTextPreference
@@ -16,6 +19,8 @@
 		android:title="@string/remote_ip"
 		android:summary="@string/remote_ip" 
 		android:defaultValue="192.168.1.5"
+		android:focusable="false" 
+      	android:focusableInTouchMode="false"
 		/>
 		
 	<EditTextPreference
@@ -24,6 +29,8 @@
 		android:title="@string/remote_port"
 		android:summary="@string/remote_port" 
 		android:defaultValue="1703"
+		android:focusable="false" 
+      	android:focusableInTouchMode="false"
 		/>
 		
 	<EditTextPreference
@@ -32,6 +39,8 @@
 		android:title="@string/local_port"
 		android:summary="@string/local_port" 
 		android:defaultValue="1703"
+		android:focusable="false" 
+      	android:focusableInTouchMode="false"
 		/>
 				
 	
