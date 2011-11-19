@@ -32,11 +32,7 @@ import com.skogtek.dmk.service.WifiService;
 
 public class Controller extends ListActivity 
 {
-    private Intent serviceIntent;
-	private boolean serviceBound = false;
-	//private DMKService dmkService;
-	//private ServiceBinder serviceBinder;
-	private ListAdapter listAdapter;
+    private ListAdapter listAdapter;
 	private ListView listView;
 	
 	 /** Messenger for communicating with service. */
@@ -149,12 +145,8 @@ public class Controller extends ListActivity
     
     void doBindService() {
     	
-    	Class c = null;
-    	if(Prefs.emulationMode){
-    		c = EmulatorService.class;
-    	}else{
-    		c = WifiService.class;
-    	}
+    	Class c = Prefs.emulationMode ? EmulatorService.class : WifiService.class;
+    	
         // Establish a connection with the service.  We use an explicit
         // class name because there is no reason to be able to let other
         // applications replace our component.
