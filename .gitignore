@@ -1,2 +1,6 @@
 gen/
 bin/
+.metadata
+.project
+.settings
+project.properties

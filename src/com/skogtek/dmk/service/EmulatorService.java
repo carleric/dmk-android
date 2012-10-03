@@ -1,12 +1,8 @@
 package com.skogtek.dmk.service;
 
-import java.io.IOException;
+import android.database.Cursor;
 
 import com.skogtek.dmk.db.EmuDataHelper;
-
-import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 
 
 public class EmulatorService extends DMKService
@@ -23,6 +19,8 @@ public class EmulatorService extends DMKService
     	
     	serviceThread = new ServiceThread();
     	serviceThread.start();
+    	
+    	start();
     }
     
     protected void stop()
@@ -37,14 +35,10 @@ public class EmulatorService extends DMKService
  
 	    try {
 	    	emuDataHelper.createDataBase();
-	 	} catch (IOException ioe) {
-	 		throw new Error("Unable to create database");
-	 	}
-	 
-	 	try {
 	 		emuDataHelper.openDataBase();
-	 	}catch(SQLException sqle){
-	 		broadcastMessage("error opening db"+ sqle.getMessage());
+	 	}catch(Exception sqle){
+	 		throw new Error("Unable to creat & open database");
+	 		//broadcastMessage("error opening db"+ sqle.getMessage());
 	 	}
 	 	
 	 	go = true;
@@ -71,13 +65,13 @@ public class EmulatorService extends DMKService
     		// run is true by default, until stopThread() is called.
     		while(run)
     		{
-    			
-    			//...spin here until doSend is set to true
-        		if(go)
+    			//...spin here until go is set to true
+        		while(go)
         		{
         			try 
         			{
-        				Cursor cursor = emuDataHelper.rawQuery("select zdata from zpacket", null);
+        				Cursor cursor = emuDataHelper.rawQuery("select zdata from data", null);
+        				cursor.moveToFirst();
         				while (cursor != null && !cursor.isLast())
         				{
 	        				String s = new String(cursor.getBlob(0));
@@ -89,6 +83,7 @@ public class EmulatorService extends DMKService
 					} 
         			catch (Exception e) 
 					{
+        				go = false;
 						broadcastMessage(e.getMessage());
 					}
         		}

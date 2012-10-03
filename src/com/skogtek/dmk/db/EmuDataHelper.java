@@ -110,11 +110,11 @@ public class EmuDataHelper extends SQLiteOpenHelper{
  
     }
  
-    public SQLiteDatabase openDataBase() throws SQLException{
+    public void openDataBase() throws SQLException{
  
     	//Open the database
         String myPath = DB_PATH + DB_NAME;
-    	return SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+    	myDataBase =  SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
  
     }
  

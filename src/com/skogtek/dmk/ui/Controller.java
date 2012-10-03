@@ -51,7 +51,7 @@ public class Controller extends ListActivity
         Prefs.remoteIP = settings.getString("remote_ip", "192.168.1.5");
         Prefs.remotePort = settings.getInt("remote_port", 1703);
         Prefs.localPort = settings.getInt("local_port", 1703);
-        Prefs.emulationMode = settings.getBoolean("emulation_mode", false);        
+        Prefs.emulationMode = settings.getBoolean("emulation_mode", true);        
         
         listAdapter = new ListAdapter(this);
         setListAdapter(listAdapter);
@@ -79,6 +79,7 @@ public class Controller extends ListActivity
             switch (msg.what) {
                 case DMKService.MSG_SET_VALUE:
                     //mCallbackText.setText("Received from service: " + msg.arg1);
+                	Log.e(Constants.LOG_ID, "Controller got message from service: "+msg.obj.toString());
                 	if(msg.obj != null)
                 		log(msg.obj.toString());
                     break;
@@ -109,22 +110,8 @@ public class Controller extends ListActivity
 
             // We want to monitor the service for as long as we are
             // connected to it.
-            try {
-                Message msg = Message.obtain(null,
-                        DMKService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-                
-                // Give it some value as an example.
-                msg = Message.obtain(null,
-                        DMKService.MSG_SET_VALUE, this.hashCode(), 0);
-                mService.send(msg);
-            } catch (RemoteException e) {
-                // In this case the service has crashed before we could even
-                // do anything with it; we can count on soon being
-                // disconnected (and then reconnected if it can be restarted)
-                // so there is no need to do anything here.
-            }
+            
+            //sendMessageToService(DMKService.MSG_START_SERVING);
             
             // As part of the sample, tell the user what happened.
             Toast.makeText(Controller.this, R.string.remote_service_connected,
@@ -145,8 +132,7 @@ public class Controller extends ListActivity
     
     void doBindService() {
     	
-    	Class c = Prefs.emulationMode ? EmulatorService.class : WifiService.class;
-    	
+    	Class c = Prefs.emulationMode ? EmulatorService.class : WifiService.class;    	
         // Establish a connection with the service.  We use an explicit
         // class name because there is no reason to be able to let other
         // applications replace our component.
@@ -155,61 +141,45 @@ public class Controller extends ListActivity
         //mCallbackText.setText("Binding.");
     }
     
-    void doUnbindService() {
-        if (mIsBound) {
-            // If we have received the service, and hence registered with
-            // it, then now is the time to unregister.
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null,
-                            DMKService.MSG_UNREGISTER_CLIENT);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                } catch (RemoteException e) {
-                    // There is nothing special we need to do if the service
-                    // has crashed.
-                }
-            }
-            
-            // Detach our existing connection.
-            unbindService(mConnection);
-            mIsBound = false;
-            //mCallbackText.setText("Unbinding.");
-        }
-    }
-    
-    void startService() {
-    	if (mIsBound){
-    		 if (mService != null) {
-                 try {
-                     Message msg = Message.obtain(null,
-                             DMKService.MSG_START_SERVING);
-                     msg.replyTo = mMessenger;
-                     mService.send(msg);
-                 } catch (RemoteException e) {
-                     // There is nothing special we need to do if the service
-                     // has crashed.
-                 }
-             }
+    void doUnBindService() {
+    	if (mIsBound) {
+    	 try {
+             Message msg = Message.obtain(null, DMKService.MSG_UNREGISTER_CLIENT);
+             msg.replyTo = mMessenger;
+             mService.send(msg);
+         } catch (RemoteException e) {
+             // In this case the service has crashed before we could even
+             // do anything with it; we can count on soon being
+             // disconnected (and then reconnected if it can be restarted)
+             // so there is no need to do anything here.
+         }
     	}
+    	// Detach our existing connection.
+         unbindService(mConnection);
+         mIsBound = false;
+         //mCallbackText.setText("Unbinding.");
+    	
     }
     
-    void stopService() {
-    	if (mIsBound){
-    		 if (mService != null) {
-                 try {
-                     Message msg = Message.obtain(null,
-                             DMKService.MSG_STOP_SERVING);
-                     msg.replyTo = mMessenger;
-                     mService.send(msg);
-                 } catch (RemoteException e) {
-                     // There is nothing special we need to do if the service
-                     // has crashed.
-                 }
-             }
+    void sendMessageToService(int msgCode) {
+    	if (mIsBound) {
+    	 try {
+             Message msg = Message.obtain(null, msgCode);
+             msg.replyTo = mMessenger;
+             mService.send(msg);
+         } catch (RemoteException e) {
+             // In this case the service has crashed before we could even
+             // do anything with it; we can count on soon being
+             // disconnected (and then reconnected if it can be restarted)
+             // so there is no need to do anything here.
+         }
     	}
-    }
-    
+    	// Detach our existing connection.
+         unbindService(mConnection);
+         mIsBound = false;
+         //mCallbackText.setText("Unbinding.");
+    	
+    }  
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
@@ -227,11 +197,10 @@ public class Controller extends ListActivity
         {
 	        case R.id.start_service:
 	        	doBindService();
-	        	startService();
 	        	return true;
 	        case R.id.stop_service:
-	        	stopService();
-	        	doUnbindService();
+	        	sendMessageToService(DMKService.MSG_STOP_SERVING);
+	        	sendMessageToService(DMKService.MSG_UNREGISTER_CLIENT);
 	            return true;
 	        case R.id.preferences:
 	        	Intent prefsActivity = new Intent(getBaseContext(),Prefs.class);
@@ -261,8 +230,6 @@ public class Controller extends ListActivity
     	
     	//send to debug log too
     	Log.d(Constants.LOG_ID, msg);
-    	
-    	
     }
        
 }
