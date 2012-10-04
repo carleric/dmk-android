@@ -1,6 +1,6 @@
 #Overview
 
-dmk-android is an Android app for connecting to a DMK yacht instruments box.  This code is meant to demonstrate how an Android developer may start to work with a DMK box. 
+dmk-android is an Android app for connecting to a DMK yacht instruments box (http://dmkyacht.com/).  This code is meant to demonstrate how an Android developer may start to work with a DMK box. 
 
 #Features
 
